@@ -23,8 +23,13 @@ public class CalcTests {
         assertThat(Calc.run("2 + 2")).isEqualTo(4);
     }
     @Test
-    @DisplayName("1000 + 200 == 1200")
+    @DisplayName("50 - 30 = 20")
     void t4() {
-        assertThat(Calc.run("1000 + 200")).isEqualTo(1200);
+        assertThat(Calc.run("50 - 30")).isEqualTo(20);
+    }
+    @Test
+    @DisplayName("100 - 20 == 80")
+    void t5() {
+        assertThat(Calc.run("100 - 20")).isEqualTo(80);
     }
 }
