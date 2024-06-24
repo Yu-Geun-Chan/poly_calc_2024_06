@@ -32,4 +32,15 @@ public class CalcTests {
     void t5() {
         assertThat(Calc.run("100 - 20")).isEqualTo(80);
     }
+    @Test
+    @DisplayName("10 + 20 + 30 == 60")
+    void t6() {
+        assertThat(Calc.run("10 + 20 + 30")).isEqualTo(60);
+    }
+    @Test
+    @DisplayName("10 + 20 + 30 + 40 == 100")
+    void t7() {
+        assertThat(Calc.run("10 + 20 + 30 + 40")).isEqualTo(100);
+    }
+
 }
