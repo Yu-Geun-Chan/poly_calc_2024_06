@@ -1,9 +1,14 @@
 package org.koreait;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class Calc {
     public static int run(String exp) {
+
+        if (!exp.contains(" ")) {
+            return Integer.parseInt(exp);
+        }
 
         boolean needToMulti = exp.contains(" * ");
         boolean needToPlus = exp.contains(" + ") || exp.contains(" - ");
@@ -13,15 +18,14 @@ public class Calc {
             exp = exp.replaceAll("- ", "+ -");
 
             String[] bits = exp.split(" \\+ ");
-            int sum = 0;
-            if (bits.length > 2) {
-                for (int i = 0; i < bits.length - 1; i++) {
-                    sum += Integer.parseInt(bits[i]);
-                }
-                return sum + run(bits[bits.length - 1]);
-            }
-            return Integer.parseInt(bits[0]) + run(bits[1]);
-        } else if(needToPlus) {
+
+            String newExp = Arrays.stream(bits)
+                    .mapToInt(Calc::run)
+                    .mapToObj(e -> e + "")
+                    .collect(Collectors.joining(" + "));
+
+            return run(newExp);
+            } else if(needToPlus) {
             exp = exp.replaceAll("- ", "+ -");
 
             String[] bits = exp.split(" \\+ ");
