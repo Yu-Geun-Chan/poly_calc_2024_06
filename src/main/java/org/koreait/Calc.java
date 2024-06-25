@@ -10,6 +10,9 @@ public class Calc {
             return Integer.parseInt(exp);
         }
 
+        exp = exp.replaceAll("\\(", "");
+        exp = exp.replaceAll("\\)", "");
+
         boolean needToMulti = exp.contains(" * ");
         boolean needToPlus = exp.contains(" + ") || exp.contains(" - ");
         boolean needToCompound = needToMulti && needToPlus;
@@ -23,6 +26,7 @@ public class Calc {
                     .mapToInt(Calc::run)
                     .mapToObj(e -> e + "")
                     .collect(Collectors.joining(" + "));
+
 
             return run(newExp);
             } else if(needToPlus) {
