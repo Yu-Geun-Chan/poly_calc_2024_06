@@ -7,12 +7,13 @@ public class Calc {
 
         boolean needToMulti = exp.contains(" * ");
         boolean needToPlus = exp.contains(" + ");
+        boolean needToCompound = needToMulti && needToPlus;
 
-
-        if(needToMulti && needToPlus) {
+        if(needToCompound) {
             String[] bits = exp.split(" \\+ ");
 
-            return Integer.parseInt(bits[0]) + Integer.parseInt(bits[1]) + run(bits[2]);
+            return Integer.parseInt(bits[0]) + run(bits[1]);
+
         } else if(needToPlus) {
             exp = exp.replaceAll("- ", "+ -");
 
