@@ -11,10 +11,11 @@ public class Calc {
         }
 
         boolean needToMulti = exp.contains(" * ");
-        boolean needToPlus = exp.contains(" + ");
+        boolean needToPlus = exp.contains(" + ") || exp.contains(" - ");
         boolean needToCompound = needToMulti && needToPlus;
 
         if(needToCompound) {
+            exp = exp.replaceAll("- ", "+ -");
 
             String[] bits = exp.split(" \\+ ");
 
