@@ -6,14 +6,21 @@ public class Calc {
     public static int run(String exp) {
 
         boolean needToMulti = exp.contains(" * ");
-        boolean needToPlus = exp.contains(" + ");
+        boolean needToPlus = exp.contains(" + ") || exp.contains(" - ");
         boolean needToCompound = needToMulti && needToPlus;
 
         if(needToCompound) {
+            exp = exp.replaceAll("- ", "+ -");
+
             String[] bits = exp.split(" \\+ ");
-
+            int sum = 0;
+            if (bits.length > 2) {
+                for (int i = 0; i < bits.length - 1; i++) {
+                    sum += Integer.parseInt(bits[i]);
+                }
+                return sum + run(bits[bits.length - 1]);
+            }
             return Integer.parseInt(bits[0]) + run(bits[1]);
-
         } else if(needToPlus) {
             exp = exp.replaceAll("- ", "+ -");
 
