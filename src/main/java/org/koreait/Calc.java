@@ -17,12 +17,15 @@ public class Calc {
         // 괄호 제거
         exp = stripOuterBrackets(exp);
 
+        // 만약에 -( 패턴이라면 내가 갖고있는 코드는 해석할 수 없으므로 해석할 수 있는 형태로 수정
+        if(isCaseMinusBracket(exp)){
+            exp = exp.substring(1) + " * -1";
+        }
+
         // 재귀호출되는 과정을 보기 위한 debug 모드
         if (debug) {
             System.out.printf("exp(%d) : %s\n", runCallCount, exp);
         }
-
-        String minus = "";
 
         // 단일항이 들어오면 바로 리턴
         if (!exp.contains(" ")) {
@@ -36,13 +39,13 @@ public class Calc {
 
         if (needToSplit) {
 
-
             int splitPointIndex = findSplitPointIndex(exp);
 
             String firstExp = exp.substring(0, splitPointIndex);
             String secondExp = exp.substring(splitPointIndex + 1);
 
             char operator = exp.charAt(splitPointIndex);
+
 
             exp = Calc.run(firstExp) + " " + operator + " " + Calc.run(secondExp);
 
@@ -67,10 +70,6 @@ public class Calc {
                 sum += Integer.parseInt(bits[i]);
             }
 
-            if (minus.equals("-")) {
-                exp = minus + sum;
-                return Integer.parseInt(exp);
-            }
             return sum;
 
         } else if (needToMulti) {
@@ -86,6 +85,28 @@ public class Calc {
         }
 
         throw new RuntimeException("해석 불가 : 올바른 계산식이 아니야");
+    }
+
+    private static boolean isCaseMinusBracket(String exp) {
+        // -(로 시작하는지 파악
+        if (exp.startsWith("-(") == false) {
+            return false;
+        }
+        // 괄호로 감싸져 있는지 파악
+        int bracketsCount = 0;
+        for(int i = 0; i < exp.length(); i++) {
+            char c = exp.charAt(i);
+
+            if (c == '(') {
+                bracketsCount++;
+            } else if (c == ')') {
+                bracketsCount--;
+            }
+            if (bracketsCount == 0) {
+                if (exp.length() - 1 == i) return true;
+            }
+        }
+        return false;
     }
 
     private static int findSplitPointIndex(String exp) {
