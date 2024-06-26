@@ -4,13 +4,27 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class Calc {
+
+    // 의도적으로 false를 true로 고쳐서 콘솔에서 재귀호출 과정을 보자 .
+    public static boolean debug = false;
+    public static int runCallCount = 0;
+
     public static int run(String exp) {
-        exp = exp.trim(); // 양 옆의 쓸데없는 공백 제거 -> " 20 " 을 "20"으로. 단, 가운데 공백은 건드리지 않는다.
+        runCallCount++;
+
+        exp = exp.trim(); // 양 옆의 쓸데없는 공백 제거
 
         // 괄호 제거
         exp = stripOuterBrackets(exp);
 
-        // 단일항(ex : 10)이 들어오면 바로 리턴
+        // 재귀호출되는 과정을 보기 위한 debug 모드
+        if (debug) {
+            System.out.printf("exp(%d) : %s\n", runCallCount, exp);
+        }
+
+        String minus = "";
+
+        // 단일항이 들어오면 바로 리턴
         if (!exp.contains(" ")) {
             return Integer.parseInt(exp);
         }
@@ -21,36 +35,23 @@ public class Calc {
         boolean needToCompound = needToMulti && needToPlus;
 
         if (needToSplit) {
-            int bracketsCount = 0;
-            int splitPointIndex = -1; // 아직 못 찾았어.
 
-            for (int i = 0; i < exp.length(); i++) {
-                if (exp.charAt(i) == '(') {
-                    bracketsCount++;
-                } else if (exp.charAt(i) == ')') {
-                    bracketsCount--;
-                }
-                if (bracketsCount == 0) {
-                    splitPointIndex = i;
-                    break;
-                }
-            }
 
-            String firstExp = exp.substring(0, splitPointIndex + 1);
-            String secondExp = exp.substring(splitPointIndex + 4);
+            int splitPointIndex = findSplitPointIndex(exp);
 
-            char operator = exp.charAt(splitPointIndex + 2);
+            String firstExp = exp.substring(0, splitPointIndex);
+            String secondExp = exp.substring(splitPointIndex + 1);
+
+            char operator = exp.charAt(splitPointIndex);
 
             exp = Calc.run(firstExp) + " " + operator + " " + Calc.run(secondExp);
 
             return Calc.run(exp);
+
         } else if (needToCompound) {
             String[] bits = exp.split(" \\+ ");
 
-            String newExp = Arrays.stream(bits)
-                    .mapToInt(Calc::run)
-                    .mapToObj(e -> e + "")
-                    .collect(Collectors.joining(" + "));
+            String newExp = Arrays.stream(bits).mapToInt(Calc::run).mapToObj(e -> e + "").collect(Collectors.joining(" + "));
 
             return run(newExp);
         }
@@ -65,6 +66,11 @@ public class Calc {
             for (int i = 0; i < bits.length; i++) {
                 sum += Integer.parseInt(bits[i]);
             }
+
+            if (minus.equals("-")) {
+                exp = minus + sum;
+                return Integer.parseInt(exp);
+            }
             return sum;
 
         } else if (needToMulti) {
@@ -75,21 +81,49 @@ public class Calc {
             for (int i = 0; i < bits.length; i++) {
                 sum *= Integer.parseInt(bits[i]);
             }
+
             return sum;
         }
+
         throw new RuntimeException("해석 불가 : 올바른 계산식이 아니야");
     }
 
-    private static String stripOuterBrackets(String exp) {
-        int outerBraketsCount = 0;
+    private static int findSplitPointIndex(String exp) {
 
-        while (exp.charAt(outerBraketsCount) == ('(') && exp.charAt(exp.length() - 1 - outerBraketsCount) == (')')) {
-            outerBraketsCount++;
+        int indexPlus = findSplitPointIndexBy(exp, '+');
+
+        if (indexPlus >= 0) return indexPlus;
+
+        return findSplitPointIndexBy(exp, '*');
+    }
+
+    private static int findSplitPointIndexBy(String exp, char findChar) {
+        int bracketsCount = 0;
+
+        for (int i = 0; i < exp.length(); i++) {
+            char c = exp.charAt(i);
+
+            if (c == '(') {
+                bracketsCount++;
+            } else if (c == ')') {
+                bracketsCount--;
+            } else if (c == findChar) {
+                if (bracketsCount == 0) return i;
+            }
         }
-        if (outerBraketsCount == 0) return exp;
+        return -1;
+    }
 
-        return exp.substring(outerBraketsCount, exp.length() - outerBraketsCount);
+    private static String stripOuterBrackets(String exp) {
+        int outerBracketsCount = 0;
 
+        while (exp.charAt(outerBracketsCount) == '(' && exp.charAt(exp.length() - 1 - outerBracketsCount) == ')') {
+            outerBracketsCount++;
+        }
+
+        if (outerBracketsCount == 0) return exp;
+
+        return exp.substring(outerBracketsCount, exp.length() - outerBracketsCount);
     }
 }
 
