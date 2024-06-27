@@ -9,7 +9,7 @@ public class Calc {
     public static int runCallCount = 0;
 
     public static int run(String exp) {
-       runCallCount++;
+         runCallCount++;
 
         exp = exp.trim(); // 양 옆의 쓸데없는 공백 제거
         // 괄호 제거
@@ -38,6 +38,7 @@ public class Calc {
         boolean needToCompound = needToMulti && needToPlus;
 
         if (needToSplit) {
+            exp = exp.replaceAll("- ", "+ -");
             int splitPointIndex = findSplitPointIndex(exp);
 
             String firstExp = exp.substring(0, splitPointIndex);
